@@ -11,12 +11,15 @@
         input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #3390ec; color: white; cursor: pointer; margin-top: 5px; }
         .recipe-btn { background: #28a745; margin-top: 15px; }
+        li { cursor: pointer; padding: 5px 0; border-bottom: 1px solid #eee; }
+        li:hover { color: red; text-decoration: line-through; }
     </style>
 </head>
 <body>
     <h2>EatSave</h2>
     <div class="card">
         <h3>🧊 Мой холодильник</h3>
+        <p><small>Нажми на продукт, чтобы удалить его</small></p>
         <input type="text" id="productInput" placeholder="Название продукта...">
         <button onclick="addProduct()">Добавить продукт</button>
         <ul id="productList"></ul>
@@ -40,11 +43,20 @@
         function loadProducts() {
             let products = JSON.parse(localStorage.getItem('products') || '[]');
             let list = document.getElementById('productList');
-            products.forEach(p => {
+            list.innerHTML = "";
+            products.forEach((p, index) => {
                 let li = document.createElement('li');
                 li.textContent = p;
+                li.onclick = () => removeProduct(index);
                 list.appendChild(li);
             });
+        }
+
+        function removeProduct(index) {
+            let products = JSON.parse(localStorage.getItem('products') || '[]');
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            location.reload();
         }
 
         function getRecipe() {
@@ -52,7 +64,7 @@
             let res = document.getElementById('recipeResult');
             res.style.display = 'block';
             if (products.length >= 2) {
-                res.innerHTML = "<h3>🍳 Рецепт:</h3><p>Из ваших ингредиентов можно приготовить вкусное блюдо! Попробуйте сделать рагу или запеканку.</p>";
+                res.innerHTML = "<h3>🍳 Рецепт:</h3><p>Из ваших ингредиентов можно приготовить вкусное блюдо!</p>";
             } else {
                 res.innerHTML = "<p>Добавьте еще хотя бы один продукт.</p>";
             }
@@ -60,4 +72,3 @@
     </script>
 </body>
 </html>
- 

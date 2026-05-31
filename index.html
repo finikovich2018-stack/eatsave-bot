@@ -2,22 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EatSave Tracker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --primary: #28a745; --bg: #f8f9fa; }
-        body { font-family: sans-serif; padding: 15px; background-color: var(--bg); }
+        body { font-family: sans-serif; padding: 15px; background-color: var(--bg); margin: 0; }
         .card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         h3 { margin: 0 0 10px 0; font-size: 18px; }
         input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; margin-bottom: 8px; }
-        button { width: 100%; padding: 10px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; }
+        button { width: 100%; padding: 10px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
         .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h3>💰 Баланс: <span id="balanceDisplay">0</span> ₽</h3>
-        <input type="number" id="priceInput" placeholder="Сумма...">
+        <input type="number" id="priceInput" placeholder="Сумма покупки (₽)...">
         <button onclick="addExpense()">Записать расход</button>
     </div>
 
@@ -29,18 +30,21 @@
     <script>
         function addExpense() {
             let price = parseInt(document.getElementById('priceInput').value);
-            if (!price) return;
+            if (!price || isNaN(price)) return;
             
+            // Сохраняем историю
             let history = JSON.parse(localStorage.getItem('history') || '[]');
             history.unshift({ amount: price, date: new Date().toLocaleDateString() });
             localStorage.setItem('history', JSON.stringify(history));
             
+            // Обновляем баланс
             let balance = parseInt(localStorage.getItem('balance') || 0) + price;
             localStorage.setItem('balance', balance);
+            
             location.reload();
         }
 
-        // Вывод истории
+        // Вывод истории на экран
         let history = JSON.parse(localStorage.getItem('history') || '[]');
         let list = document.getElementById('historyList');
         history.forEach(item => {

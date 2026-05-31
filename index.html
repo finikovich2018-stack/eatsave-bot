@@ -8,8 +8,9 @@
     <style>
         body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
         .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; }
-        button { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #3390ec; color: white; cursor: pointer; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; border: none; border-radius: 8px; background: #3390ec; color: white; cursor: pointer; margin-top: 5px; }
+        .recipe-btn { background: #28a745; }
     </style>
 </head>
 <body>
@@ -19,27 +20,23 @@
         <input type="text" id="productInput" placeholder="Название продукта...">
         <button onclick="addProduct()">Добавить продукт</button>
         <ul id="productList"></ul>
+        <button class="recipe-btn" onclick="getRecipe()">Что приготовить?</button>
     </div>
+    <div id="recipeResult" class="card" style="display:none;"></div>
 
     <script>
-        // Функция загрузки продуктов при открытии
         document.addEventListener('DOMContentLoaded', loadProducts);
 
         function addProduct() {
             let input = document.getElementById('productInput');
-            let list = document.getElementById('productList');
-            if (input.value === "") return;
+            let val = input.value;
+            if (val === "") return;
 
-            let li = document.createElement('li');
-            li.textContent = input.value;
-            list.appendChild(li);
-
-            // Сохраняем в память
             let products = JSON.parse(localStorage.getItem('products') || '[]');
-            products.push(input.value);
+            products.push(val);
             localStorage.setItem('products', JSON.stringify(products));
-
-            input.value = "";
+            
+            location.reload(); // Перезагружаем для отображения
         }
 
         function loadProducts() {
@@ -50,6 +47,18 @@
                 li.textContent = p;
                 list.appendChild(li);
             });
+        }
+
+        function getRecipe() {
+            let products = JSON.parse(localStorage.getItem('products') || '[]');
+            let res = document.getElementById('recipeResult');
+            res.style.display = 'block';
+            
+            if (products.length >= 2) {
+                res.innerHTML = "<h3>🍳 Рецепт:</h3><p>Из ваших ингредиентов (" + products.join(', ') + ") можно приготовить тушеное мясо с картошкой!</p>";
+            } else {
+                res.innerHTML = "<p>Добавьте еще хотя бы один продукт для рецепта.</p>";
+            }
         }
     </script>
 </body>

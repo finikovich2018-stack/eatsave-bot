@@ -2,58 +2,49 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EatSave Tracker</title>
+    <title>EatSave AI</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --primary: #28a745; --bg: #f8f9fa; }
         body { font-family: sans-serif; padding: 15px; background-color: var(--bg); margin: 0; }
         .card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        h3 { margin: 0 0 10px 0; font-size: 18px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; margin-bottom: 8px; }
-        button { width: 100%; padding: 10px; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
-        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .ai-btn { background: #6c5ce7; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; }
+        #aiResult { color: #2d3436; font-style: italic; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h3>💰 Баланс: <span id="balanceDisplay">0</span> ₽</h3>
-        <input type="number" id="priceInput" placeholder="Сумма покупки (₽)...">
-        <button onclick="addExpense()">Записать расход</button>
+        <h3>🧊 Что приготовить из этого?</h3>
+        <ul id="productList" style="margin: 10px 0;"></ul>
+        <button class="ai-btn" onclick="generateRecipe()">🧠 Спросить у ИИ</button>
     </div>
-
-    <div class="card">
-        <h3>📜 Последние траты</h3>
-        <div id="historyList"></div>
-    </div>
+    <div class="card" id="aiResult" style="display:none;"></div>
 
     <script>
-        function addExpense() {
-            let price = parseInt(document.getElementById('priceInput').value);
-            if (!price || isNaN(price)) return;
-            
-            // Сохраняем историю
-            let history = JSON.parse(localStorage.getItem('history') || '[]');
-            history.unshift({ amount: price, date: new Date().toLocaleDateString() });
-            localStorage.setItem('history', JSON.stringify(history));
-            
-            // Обновляем баланс
-            let balance = parseInt(localStorage.getItem('balance') || 0) + price;
-            localStorage.setItem('balance', balance);
-            
-            location.reload();
-        }
-
-        // Вывод истории на экран
-        let history = JSON.parse(localStorage.getItem('history') || '[]');
-        let list = document.getElementById('historyList');
-        history.forEach(item => {
-            let div = document.createElement('div');
-            div.className = 'history-item';
-            div.innerHTML = `<span>${item.date}</span> <b>${item.amount} ₽</b>`;
-            list.appendChild(div);
+        // Загружаем продукты из памяти
+        let products = JSON.parse(localStorage.getItem('products') || '[]');
+        let list = document.getElementById('productList');
+        products.forEach(p => {
+            let li = document.createElement('li');
+            li.textContent = p;
+            list.appendChild(li);
         });
-        document.getElementById('balanceDisplay').innerText = localStorage.getItem('balance') || 0;
+
+        function generateRecipe() {
+            let res = document.getElementById('aiResult');
+            res.style.display = 'block';
+            
+            if (products.length < 2) {
+                res.innerHTML = "💡 Добавьте хотя бы 2-3 ингредиента, чтобы ИИ мог придумать рецепт.";
+                return;
+            }
+
+            // Имитация "умного" анализа
+            let recipe = "На основе: " + products.join(', ') + ". ";
+            recipe += "ИИ предлагает: Приготовьте **«Ассорти-сковородку»**. Обжарьте ваши ингредиенты с добавлением специй, добавьте немного сметаны для соуса — получится сытное и быстрое блюдо!";
+            
+            res.innerHTML = "<h3>🍳 Рецепт от EatSave AI</h3><p>" + recipe + "</p>";
+        }
     </script>
 </body>
 </html>
